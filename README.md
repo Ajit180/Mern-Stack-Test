@@ -74,7 +74,7 @@ npm start
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 
 Frontend will run on `http://localhost:5173` (Vite/CRA depending on your setup).
