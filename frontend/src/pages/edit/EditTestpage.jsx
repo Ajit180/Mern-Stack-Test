@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from '../../config/axiosconfig'
 
 function TestEditPage() {
   const navigate = useNavigate();
@@ -7,21 +8,22 @@ function TestEditPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/statements/random")
-      .then((res) => res.json())
-      .then((data) => {
-        const three = data.slice(0, 3); // only 3
+    const fetchStatements = async () => {
+      try {
+        const res = await axios.get("/statements/random"); 
+        const three = res.data.slice(0, 3); // only 3
         setStatements(three);
 
         // ✅ Save in localStorage
         localStorage.setItem("selectedStatements", JSON.stringify(three));
+      } catch (err) {
+        console.error("Error fetching statements:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+    fetchStatements();
   }, []);
 
   if (loading) return <p className="text-white">Loading statements...</p>;

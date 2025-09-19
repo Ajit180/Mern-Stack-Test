@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../config/axiosconfig"; 
 
 const ResultPage = () => {
   const [results, setResults] = useState([]);
@@ -8,10 +8,16 @@ const ResultPage = () => {
     const corrected = JSON.parse(localStorage.getItem("correctedStatements"));
 
     if (corrected) {
-      axios
-        .post("http://localhost:3000/api/result", { statements: corrected })
-        .then((res) => setResults(res.data.results))
-        .catch((err) => console.error(err));
+      const sendResults = async () => {
+        try {
+          const res = await axios.post("/result", { statements: corrected });
+          setResults(res.data.results);
+        } catch (err) {
+          console.error("Error submitting results:", err);
+        }
+      };
+
+      sendResults();
     }
   }, []);
 

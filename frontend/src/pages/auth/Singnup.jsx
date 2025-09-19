@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const Signup = () => {
     email: "",
     password: "",
   });
+
+   const navigate = useNavigate();
 
   // ✅ React Query mutation
   const mutation = useMutation({
@@ -18,6 +21,8 @@ const Signup = () => {
     onSuccess: (data) => {
       console.log("Signup Success:", data);
       alert("Signup successful ");
+        // 👉 redirect to login page
+      navigate("/signin");
     },
     onError: (error) => {
       console.error("Signup Error:", error);

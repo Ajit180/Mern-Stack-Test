@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "../../config/axiosconfig"
 
 function TestPage() {
   const [statements, setStatements] = useState([]);
@@ -7,20 +8,24 @@ function TestPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // ✅ Check localStorage first
     const saved = localStorage.getItem("selectedStatements");
     if (saved) {
       setStatements(JSON.parse(saved));
       setLoading(false);
     } else {
-      // fallback to API
-      fetch("http://localhost:3000/api/statements/random")
-        .then((res) => res.json())
-        .then((data) => {
-          setStatements(data.slice(0, 3));
+     
+      const fetchStatements = async () => {
+        try {
+          const res = await axios.get("/statements/random");
+          setStatements(res.data.slice(0, 3));
+        } catch (err) {
+          console.error("Error fetching statements:", err);
+        } finally {
           setLoading(false);
-        })
-        .catch((err) => console.error(err));
+        }
+      };
+
+      fetchStatements();
     }
   }, []);
 
@@ -33,27 +38,23 @@ function TestPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Save corrected statements in localStorage
+      // ✅ Save corrected statements in localStorage
       localStorage.setItem("correctedStatements", JSON.stringify(statements));
 
-      // ✅ If you still want DB update, keep this
+      // ✅ Update DB if needed
       await Promise.all(
         statements.map((s) =>
-          fetch(`http://localhost:3000/api/statements/${s._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: s.text }),
-          })
+          axios.put(`/statements/${s._id}`, { text: s.text })
         )
       );
 
       navigate("/result");
     } catch (err) {
-      console.error(err);
+      console.error("Error submitting statements:", err);
     }
   };
 
-  if (loading) return <p>Loading statements...</p>;
+  if (loading) return <p className="text-white">Loading statements...</p>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-800 px-4">
