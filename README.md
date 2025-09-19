@@ -31,7 +31,7 @@ project-root/
 
 1. **User Authentication**
 
-   * Registration and Login using JWT.
+   * Registration and Login with password bcrypt.
    * Passwords securely stored in database.
 
 2. **Test Page**
